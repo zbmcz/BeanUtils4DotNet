@@ -31,6 +31,14 @@ namespace Abchina.Ebiz.Tools.BeanUtils.Test
                 Console.WriteLine("----" + item.Key + "----" + item.Value + "----");
             }
 
+            Dictionary<string, Object> dictionary = new Dictionary<string, object>();
+            dictionary.Add("Name","zbmcz");
+            dictionary.Add("Company","alibaba");
+            dictionary.Add("school","zhejiangdaxue");
+            Student stu3 = new Student();
+            BeanUtils.populate(stu3,dictionary);
+            Console.WriteLine(stu3);
+
             Console.ReadKey();
         }
     }

@@ -53,11 +53,30 @@ namespace Abchina.Ebiz.Tools.BeanUtils
         /// <param name="origin">Origin.</param>
         public static void CopyPorperties(Object dest,Object origin)
         {
-            Type beanType = dest.GetType();
-            PropertyInfo[] propInfos = beanType.GetProperties();
-            foreach(var prop in propInfos)
+            Type originType = origin.GetType();
+            PropertyInfo[] originProps = originType.GetProperties();
+            foreach(var originProp in originProps)
             {
-                prop.SetValue(dest,prop.GetValue(origin));
+                PropertyInfo destProp = dest.GetType().GetProperty(originProp.Name);
+                if(destProp != null)
+                    originProp.SetValue(dest,originProp.GetValue(origin));
+            }
+        }
+
+        public static T CopyPorperties<T>(Object origin)
+        {
+            if (origin == null)
+                return null;
+            // create instance of T
+
+
+            Type originType = origin.GetType();
+            PropertyInfo[] originProps = originType.GetProperties();
+            foreach (var originProp in originProps)
+            {
+                PropertyInfo destProp = T.GetType().GetProperty(originProp.Name);
+                if (destProp != null)
+                    originProp.SetValue(dest, originProp.GetValue(origin));
             }
         }
 
@@ -90,5 +109,63 @@ namespace Abchina.Ebiz.Tools.BeanUtils
             return ret;
         }
 
+        /*********想不明白这种方法到底有啥子用啊？？？*********/
+        /// <summary>
+        /// Return the value of the specified array property of the specified bean, as a string array.
+        /// </summary>
+        /// <returns>The array property.</returns>
+        /// <param name="bean">Bean.</param>
+        /// <param name="name">Name.</param>
+        public static string[] GetArrayProperty(Object bean,string name)
+        {
+            PropertyInfo propInfo = bean.GetType().GetProperty(name);
+            try{
+                Object[] value = (object[])propInfo.GetValue(bean);
+                string[] ret = new string[value.Length];
+                for (int i = 0; i < value.Length; i++)
+                {
+                    ret[i] = value[i].ToString();
+                }
+                return ret;
+            }catch(Exception e){
+                Console.WriteLine(e.ToString());
+                return null;
+            }
+        }
+        public static string GetIndexedProperty(Object bean,string name){
+            return null;
+        }
+        public static string GetIndexedProperty(Object bean, string name,int index)
+        {
+            return null;
+        }
+        public static string GetMappedProperty(Object bean, string name){
+            return null;
+        }
+        public static string GetMappedProperty(Object bean, string name,string key)
+        {
+            return null;
+        }
+        public static string GetNestedProperty(Object bean, string name)
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Populate the C#Beans properties of the specified bean, based on the specified name/value pairs.
+        /// </summary>
+        /// <returns>The populate.</returns>
+        /// <param name="bean">Bean.</param>
+        /// <param name="properties">Properties.</param>
+        public static void populate(Object bean,Dictionary<string,Object> properties)
+        {
+            if (properties == null)
+                return;
+            foreach(var item in properties){
+                PropertyInfo propInfo = bean.GetType().GetProperty(item.Key);
+                if(propInfo != null)
+                    propInfo.SetValue(bean,item.Value);
+            }
+        }
     }
 }
