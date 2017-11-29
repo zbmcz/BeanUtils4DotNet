@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Web;
 
 namespace Abchina.Ebiz.Tools.BeanUtils.Test
 {
@@ -23,7 +24,7 @@ namespace Abchina.Ebiz.Tools.BeanUtils.Test
             Console.WriteLine(stu1.ToString());
 
             Student stu2 = new Student();
-            BeanUtils.CopyPorperties(stu2,stu1);
+            BeanUtils.CopyPorperties(stu1,stu2);
             Console.WriteLine(stu2.ToString());
 
             Dictionary<string,object> dic = BeanUtils.Describe(stu2);
@@ -39,8 +40,37 @@ namespace Abchina.Ebiz.Tools.BeanUtils.Test
             BeanUtils.populate(stu3,dictionary);
             Console.WriteLine(stu3);
 
+            Student stu4 = BeanUtils.CopyPorperties<Student>(stu3);
+            Console.WriteLine(stu4);
+
             Console.ReadKey();
         }
+    }
+    class Animal
+    {
+        public Animal(string food)
+        {
+            this._food = food;
+        }
+        public Animal()
+        {
+
+        }
+        public string Name
+        {
+            get; set;
+        }
+        private string _food;
+        public string Food
+        {
+            get{
+                return this._food;
+            }
+            set{
+                this._food = value;
+            }
+        }
+
     }
     class Student
     {
@@ -48,10 +78,6 @@ namespace Abchina.Ebiz.Tools.BeanUtils.Test
         public string Name{
             get;set;
         }
-        private string Sex{
-            get;set;
-        }
-
         private string _company;
         public string Company { 
             get{

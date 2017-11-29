@@ -9,7 +9,7 @@ namespace Abchina.Ebiz.Tools.BeanUtils
     public class BeanUtils
     {
         
-        public BeanUtils()
+        private BeanUtils()
         {
         }
 
@@ -24,6 +24,7 @@ namespace Abchina.Ebiz.Tools.BeanUtils
         {
             Type beanType = bean.GetType();
             Type[] constructorArgTypes = Type.EmptyTypes;
+            // 上一句代码等同于 Type[] constructorArgTypes = new Type[0];
 
             if (constructorArgs != null){
                 constructorArgTypes = new Type[constructorArgs.Length];
@@ -51,7 +52,7 @@ namespace Abchina.Ebiz.Tools.BeanUtils
         /// </summary>
         /// <param name="dest">Destination.</param>
         /// <param name="origin">Origin.</param>
-        public static void CopyPorperties(Object dest,Object origin)
+        public static void CopyPorperties(Object origin,Object dest)
         {
             Type originType = origin.GetType();
             PropertyInfo[] originProps = originType.GetProperties();
@@ -63,21 +64,37 @@ namespace Abchina.Ebiz.Tools.BeanUtils
             }
         }
 
-        public static T CopyPorperties<T>(Object origin)
+        public static T CopyPorperties<T>(Object origin,Object[] destConstructorArgs = null)
         {
             if (origin == null)
-                return null;
-            // create instance of T
-
+                return default(T);
+            T ret = default(T);
+            // 
+            //T.GetType();
+            Type[] destConstructorArgTypes = Type.EmptyTypes;
+            if (destConstructorArgs != null)
+            {
+                destConstructorArgTypes = new Type[destConstructorArgs.Length];
+                for (int i = 0; i < destConstructorArgs.Length; i++)
+                {
+                    destConstructorArgTypes[i] = destConstructorArgs[i].GetType();
+                }
+            }
+            // get the T constructor by argument type
+            ret.GetType();
+            ConstructorInfo constructor = ret.GetType().GetConstructor(destConstructorArgTypes);
+            // get the instance of T
+            ret = (T)constructor.Invoke(destConstructorArgs);
 
             Type originType = origin.GetType();
             PropertyInfo[] originProps = originType.GetProperties();
             foreach (var originProp in originProps)
             {
-                PropertyInfo destProp = T.GetType().GetProperty(originProp.Name);
+                PropertyInfo destProp = ret.GetType().GetProperty(originProp.Name);
                 if (destProp != null)
-                    originProp.SetValue(dest, originProp.GetValue(origin));
+                    originProp.SetValue(ret, originProp.GetValue(origin));
             }
+            return (T)ret;
         }
 
         /// <summary>
@@ -109,6 +126,25 @@ namespace Abchina.Ebiz.Tools.BeanUtils
             return ret;
         }
 
+        /// <summary>
+        /// Populate the C#Beans properties of the specified bean, based on the specified name/value pairs.
+        /// </summary>
+        /// <returns>The populate.</returns>
+        /// <param name="bean">Bean.</param>
+        /// <param name="properties">Properties.</param>
+        public static void populate(Object bean, Dictionary<string, Object> properties)
+        {
+            if (properties == null)
+                return;
+            foreach (var item in properties)
+            {
+                PropertyInfo propInfo = bean.GetType().GetProperty(item.Key);
+                if (propInfo != null)
+                    propInfo.SetValue(bean, item.Value);
+            }
+        }
+
+        // 以下方法都是参考 java中的commons-beanutils
         /*********想不明白这种方法到底有啥子用啊？？？*********/
         /// <summary>
         /// Return the value of the specified array property of the specified bean, as a string array.
@@ -151,21 +187,5 @@ namespace Abchina.Ebiz.Tools.BeanUtils
             return null;
         }
 
-        /// <summary>
-        /// Populate the C#Beans properties of the specified bean, based on the specified name/value pairs.
-        /// </summary>
-        /// <returns>The populate.</returns>
-        /// <param name="bean">Bean.</param>
-        /// <param name="properties">Properties.</param>
-        public static void populate(Object bean,Dictionary<string,Object> properties)
-        {
-            if (properties == null)
-                return;
-            foreach(var item in properties){
-                PropertyInfo propInfo = bean.GetType().GetProperty(item.Key);
-                if(propInfo != null)
-                    propInfo.SetValue(bean,item.Value);
-            }
-        }
     }
 }
